@@ -1,0 +1,15 @@
+{
+  "name": "WebRTC.Samples",
+  "version": "1.0.0",
+  "description": "WebRTC Samples",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "http-server -a 0.0.0.0 -p 8000"
+  },
+  "author": "Amir Mohtasebi",
+  "license": "ISC",
+    "devDependencies": {
+    "http-server": "^0.7.4"
+  }
+}

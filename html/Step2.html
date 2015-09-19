@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>getUserMedia Sample</title>
+</head>
+<body>
+<br />
+<button id="btnStart">Start</button>&nbsp;
+<button id="btnStop">Stop</button>&nbsp;
+<button id="btnCapture">Capture</button>
+<br />
+<br />
+<video id="selfVideoObj" autoplay></video>
+<canvas id="captureCanvas"></canvas>
+
+
+<script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+<script type="text/javascript" src="../bower_components/webrtc-adapter/adapter.js"></script>
+
+<script type="text/javascript">
+    
+    var initVideo = function() {
+        var constraints = { 
+            audio: false,
+            video: true 
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints)
+        .then(function(stream) {
+            var videoTracks = stream.getVideoTracks();
+            window.videoTracks = videoTracks;
+            console.log(videoTracks);
+
+            stream.onended = function() {
+                console.log('Stream ended');
+            };
+
+            window.stream = stream;
+            document.querySelector('#selfVideoObj').srcObject = stream;
+        })
+        .catch(function(error) { 
+            if (error.name === 'ConstraintNotSatisfiedError') {
+                alert('The resolution ' + constraints.video.width.exact + 'x' +
+                constraints.video.width.exact + ' px is not supported by your device.');
+            } else if (error.name === 'PermissionDeniedError') {
+                alert('Permissions have not been granted to use your camera and ' +
+                'microphone, you need to allow the page access to your devices in ' +
+                'order for the demo to work.');
+            }
+        });
+    };
+
+    document.getElementById("btnStart").addEventListener('click', initVideo);
+
+    document.getElementById("btnStop").addEventListener('click', function() { window.videoTracks[0].stop(); });
+
+
+    var captureShot = function() {
+        var videoObj = document.querySelector('#selfVideoObj');
+        var canvasObj = document.getElementById("captureCanvas");
+        canvasObj.width = videoObj.videoWidth;
+        canvasObj.height = videoObj.videoHeight;
+
+        canvasObj.getContext('2d').drawImage(videoObj, 0, 0, canvasObj.width, canvasObj.height);
+    };
+
+    document.getElementById("btnCapture").addEventListener('click', captureShot);
+
+</script>
+
+</body>
+</html>
