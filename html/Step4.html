@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>getUserMedia Sample</title>
+</head>
+<body>
+<br />
+<button id="btnStartQVGA">QVGA</button>&nbsp;
+<button id="btnStartVGA">VGA</button>&nbsp;
+<button id="btnStartHD">HD</button>
+<button id="btnStartFullHD">Full HD</button>
+<br />
+<br />
+<video id="selfVideoObj" autoplay></video>
+
+<script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+<script type="text/javascript" src="../bower_components/webrtc-adapter/adapter.js"></script>
+
+<script type="text/javascript">
+    
+    var constraints = { 
+        audio: false,
+        video: true 
+    };
+
+    var initVideo = function() {
+
+        navigator.mediaDevices.getUserMedia(constraints)
+        .then(function(stream) {
+            var videoTracks = stream.getVideoTracks();
+            window.videoTracks = videoTracks;
+            console.log(videoTracks);
+
+            stream.onended = function() {
+                console.log('Stream ended');
+            };
+
+            window.stream = stream;
+            document.querySelector('#selfVideoObj').srcObject = stream;
+        })
+        .catch(function(error) { 
+            if (error.name === 'ConstraintNotSatisfiedError') {
+                var exactWidth = constraints.video.width ? constraints.video.width.exact : "NA"; 
+                var exactHeight = constraints.video.height ? constraints.video.height.exact : "NA";
+                alert('The resolution ' + exactWidth + 'x' +
+                exactHeight + ' px is not supported by your device.');
+            } else if (error.name === 'PermissionDeniedError') {
+                alert('Permissions have not been granted to use your camera and ' +
+                'microphone, you need to allow the page access to your devices in ' +
+                'order for the demo to work.');
+            }
+        });
+    };
+
+    var stopTracks = function() {
+        if (window.stream) {
+            window.videoTracks.forEach(function(vid) {
+                vid.stop();
+            });
+        }
+    };
+
+    var initQVGAVideo = function() {
+        stopTracks();
+        constraints.video = { width: {exact: 320}, height: {exact: 240} };
+        initVideo();
+    };
+
+    var initVGAVideo = function() {
+        stopTracks();
+        constraints.video = { width: {exact: 640}, height: {exact: 480} };
+        initVideo();
+    };
+
+    var initHDVideo = function() {
+        stopTracks();
+        constraints.video = { width: 1280, height: 720 };
+        initVideo();
+    };
+
+    var initFullHDVideo = function() {
+        stopTracks();
+        constraints.video = { width: {exact: 1920}, height: {exact: 1080} };
+        initVideo();
+    };
+
+    document.getElementById("btnStartQVGA").addEventListener('click', initQVGAVideo);
+
+    document.getElementById("btnStartVGA").addEventListener('click', initVGAVideo);
+
+    document.getElementById("btnStartHD").addEventListener('click', initHDVideo);
+
+    document.getElementById("btnStartFullHD").addEventListener('click', initFullHDVideo);
+
+</script>
+
+</body>
+</html>
