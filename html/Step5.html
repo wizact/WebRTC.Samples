@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>getUserMedia Sample</title>
+</head>
+<body>
+<br />
+Audio Input:
+<select id="audioInputList">    
+</select>
+<br>
+Audio Output:
+<select id="audioOutputList">    
+</select>
+<br>
+Video Input:
+<select id="videoInputList">    
+</select>
+<br />
+<button id="startMedia">Start Media</button>
+&nbsp;&nbsp;
+<button id="stopMedia">Stop Media</button>
+<br />
+<video id="selfVideoObj" autoplay></video>
+
+<script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+<script type="text/javascript" src="../bower_components/webrtc-adapter/adapter.js"></script>
+<script type="text/javascript" src="../assets/js/currier.js"></script>
+<script type="text/javascript" src="../assets/js/mediaInterface.js"></script>
+<script type="text/javascript">
+
+var fillSelectList = function(devices, selectInputId) {
+    devices.forEach(function(d, i) {
+        var optionElement = document.createElement("option");
+        optionElement.text = d.label || "Device " + i;
+        optionElement.value = d.deviceId;
+        document.getElementById(selectInputId).appendChild(optionElement);
+    });
+};
+
+var videoSource = "";
+var audioSource = "";
+
+var getAudioDevicesInputCb = function(devices) {
+    fillSelectList(devices, "audioInputList");
+    audioSource = document.querySelector("#audioInputList").value;
+};
+
+var getAudioDevicesInputCbErr = function(err) {
+    console.log(err);
+};
+
+var getAudioDevicesOutputCb = function(devices) {
+    fillSelectList(devices, "audioOutputList");
+};
+
+var getAudioDevicesOutputCbErr = function(err) {
+    console.log(err);
+};
+
+var getVideoDevicesInputCb = function(devices) {
+    fillSelectList(devices, "videoInputList");
+    videoSource = document.querySelector("#videoInputList").value;
+};
+
+var getVideoDevicesInputCbErr = function(err) {
+    console.log(err);
+};
+
+var mediaIO = mediaInterface();
+mediaIO.init("selfVideoObj");
+mediaIO.getAudioInputDevices(getAudioDevicesInputCb, getAudioDevicesInputCbErr);
+mediaIO.getAudioOutputDevices(getAudioDevicesOutputCb, getAudioDevicesOutputCbErr);
+mediaIO.getVideoInputDevices(getVideoDevicesInputCb, getVideoDevicesInputCbErr);
+
+document.getElementById("startMedia").onclick = function() {
+    var constraints = {
+        audio: {deviceId: audioSource},
+        video: {deviceId: videoSource}
+    };
+
+    mediaIO.start(constraints);
+};
+
+document.getElementById("stopMedia").onclick = function() {
+    mediaIO.stopAllTracks();
+};
+
+</script>
+
+</body>
+</html>
